@@ -1,0 +1,16 @@
+{
+  "@@locale": "zh",
+  "please_check_your_connection": "请检查您的连接",
+  "server_error": "服务器错误",
+  "access_to_location_denied": "访问位置被拒绝",
+  "allow_access_to_the_location_services": "允许访问位置服务",
+  "access_to_location_permanently_denied": "永久拒绝访问位置",
+  "allow_access_to_the_location_services_from_settings": "允许使用设备设置访问此应用的位置服务",
+  "ok": "好的",
+  "cant_get_current_location": "无法获取当前位置",
+  "please_make_sure_you_enable_gps_and_try_again": "请确保您启用 GPS 并重试",
+  "search_place": "搜索地点",
+  "finding_place": "找地方...",
+  "no_result_found": "未找到结果",
+  "unnamedPlace": "未命名的地方"
+}
