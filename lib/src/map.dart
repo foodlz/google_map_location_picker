@@ -82,6 +82,22 @@ class MapPickerState extends State<MapPicker> {
 
   String? _placeId;
 
+  String? _streetNumber;
+
+  String? _routeName;
+
+  String? _localityName;
+
+  String? _administrativeAreaLevel1;
+
+  String? _administrativeAreaLevel2;
+
+  String? _administrativeAreaLevel3;
+
+  String? _countryName;
+
+  String? _postalCode;
+
   void _onToggleMapTypePressed() {
     final MapType nextType =
         MapType.values[(_currentMapType.index + 1) % MapType.values.length];
@@ -255,6 +271,14 @@ class MapPickerState extends State<MapPicker> {
                           latLng: locationProvider.lastIdleLocation,
                           address: _address,
                           placeId: _placeId,
+                          streetNumber: _streetNumber,
+                          routeName: _routeName,
+                          localityName: _localityName,
+                          administrativeAreaLevel1: _administrativeAreaLevel1,
+                          administrativeAreaLevel2: _administrativeAreaLevel2,
+                          administrativeAreaLevel3: _administrativeAreaLevel3,
+                          countryName: _countryName,
+                          postalCode: _postalCode
                         )
                       });
                     },
@@ -280,15 +304,56 @@ class MapPickerState extends State<MapPicker> {
               headers: await LocationUtils.getAppHeaders()))
           .body);
 
+      List<dynamic>? addressComponents = response['results'][0]['address_components'];
+      addressComponents?.forEach((addressComponents) {
+        String type = addressComponents['types'][0].toString();
+        switch (type) {
+          case 'street_number':
+            _streetNumber = addressComponents['long_name'].toString();
+            break;
+          case 'route':
+            _routeName = addressComponents['long_name'].toString();
+            break;
+          case 'locality':
+            _localityName = addressComponents['long_name'].toString();
+            break;
+          case 'administrative_area_level_3':
+            _administrativeAreaLevel3 = addressComponents['long_name'].toString();
+            break;
+          case 'administrative_area_level_2':
+            _administrativeAreaLevel2 = addressComponents['long_name'].toString();
+            break;
+          case 'administrative_area_level_1':
+            _administrativeAreaLevel1 = addressComponents['long_name'].toString();
+            break;
+          case 'country':
+            _countryName = addressComponents['long_name'].toString();
+            break;
+          case 'postal_code':
+            _postalCode = addressComponents['long_name'].toString();
+            break;
+          default:
+            break;
+        }
+      });
+
       return {
         "placeId": response['results'][0]['place_id'],
-        "address": response['results'][0]['formatted_address']
+        "address": response['results'][0]['formatted_address'],
+        "streetNumber": _streetNumber,
+        "routeName": _routeName,
+        "localityName": _localityName,
+        "administrativeAreaLevel3": _administrativeAreaLevel3,
+        "administrativeAreaLevel2": _administrativeAreaLevel2,
+        "administrativeAreaLevel1": _administrativeAreaLevel1,
+        "countryName": _countryName,
+        "postalCode": _postalCode,
       };
     } catch (e) {
       print(e);
     }
 
-    return {"placeId": null, "address": null};
+    return {"placeId": null, "address": null, "streetNumber": null, "routeName": null, "localityName": null, "administrativeAreaLevel3": null, "administrativeAreaLevel2": null, "administrativeAreaLevel1": null, "countryName": null, "postalCode": null};
   }
 
   Widget pin() {
