@@ -1,7 +1,8 @@
 import 'dart:io';
 
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 
 class LocationUtils {
   static const _platform = const MethodChannel('google_map_location_picker');
@@ -11,7 +12,9 @@ class LocationUtils {
     if (_appHeaderCache.isEmpty) {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-      if (Platform.isIOS) {
+      if (kIsWeb) {
+        _appHeaderCache = {};
+      } else if (Platform.isIOS) {
         _appHeaderCache = {
           "X-Ios-Bundle-Identifier": packageInfo.packageName,
         };
