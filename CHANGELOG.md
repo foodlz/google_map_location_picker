@@ -1,3 +1,6 @@
+## 4.1.8
+* updates
+
 ## 4.1.7
 
 * Updated deps to work with flutter stable 2.0.1
