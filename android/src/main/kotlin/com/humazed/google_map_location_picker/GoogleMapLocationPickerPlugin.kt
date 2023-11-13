@@ -1,7 +1,6 @@
 package com.humazed.google_map_location_picker
 
 import androidx.annotation.NonNull
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -30,16 +29,26 @@ class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, Activity
         }
         if (call.method == "getSigningCertSha1") {
             try {
-                val info: PackageInfo = activityBinding.activity.packageManager.getPackageInfo(call.arguments<String>(), PackageManager.GET_SIGNATURES)
-                for (signature in info.signatures) {
-                    val md: MessageDigest = MessageDigest.getInstance("SHA1")
-                    md.update(signature.toByteArray())
+                val packageName = call.arguments<String>() ?: run {
+                    result.error("ERROR", "Package name is null", null)
+                    return
+                }
 
-                    val bytes: ByteArray = md.digest()
-                    val bigInteger = BigInteger(1, bytes)
-                    val hex: String = String.format("%0" + (bytes.size shl 1) + "x", bigInteger)
+                val info: PackageInfo? = activityBinding?.activity?.packageManager?.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
 
-                    result.success(hex)
+                if (info != null) {
+                    for (signature in info.signatures) {
+                        val md: MessageDigest = MessageDigest.getInstance("SHA1")
+                        md.update(signature.toByteArray())
+
+                        val bytes: ByteArray = md.digest()
+                        val bigInteger = BigInteger(1, bytes)
+                        val hex: String = String.format("%0" + (bytes.size shl 1) + "x", bigInteger)
+
+                        result.success(hex)
+                    }
+                } else {
+                    result.error("ERROR", "Package info is null", null)
                 }
             } catch (e: Exception) {
                 result.error("ERROR", e.toString(), null)
