@@ -14,7 +14,7 @@ dependencies:
 
   flutter_localizations:
     sdk: flutter
-  intl: ^0.17.0
+  intl: ^0.17.0-nullsafety.2
 
   google_maps_flutter: ^2.1.10
   geolocator: ^9.0.1
