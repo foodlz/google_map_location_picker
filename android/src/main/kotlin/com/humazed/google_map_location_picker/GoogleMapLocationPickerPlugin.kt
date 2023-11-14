@@ -1,6 +1,7 @@
 package com.humazed.google_map_location_picker
 
 import androidx.annotation.NonNull
+
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -13,8 +14,8 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import android.content.pm.PackageInfo
 
-class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
-    private lateinit var channel: MethodChannel
+class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, ActivityAware  {
+    private lateinit var channel : MethodChannel
     private var activityBinding: ActivityPluginBinding? = null
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -23,31 +24,22 @@ class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, Activity
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+        if(activityBinding == null) {
+            result.notImplemented()
+            return
+        }
         if (call.method == "getSigningCertSha1") {
             try {
-                val packageName: String? = call.arguments()
-                val binding: ActivityPluginBinding? = activityBinding
+                val info: PackageInfo = activityBinding!!.activity.packageManager.getPackageInfo(call.arguments<String>(), PackageManager.GET_SIGNATURES)
+                for (signature in info.signatures) {
+                    val md: MessageDigest = MessageDigest.getInstance("SHA1")
+                    md.update(signature.toByteArray())
 
-                if (packageName != null && packageName.isNotBlank() && binding != null) {
-                    val info: PackageInfo? = binding.activity.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+                    val bytes: ByteArray = md.digest()
+                    val bigInteger = BigInteger(1, bytes)
+                    val hex: String = String.format("%0" + (bytes.size shl 1) + "x", bigInteger)
 
-                    if (info != null) {
-                        for (signature in info.signatures) {
-                            val md: MessageDigest = MessageDigest.getInstance("SHA1")
-                            md.update(signature.toByteArray())
-
-                            val bytes: ByteArray = md.digest()
-                            val bigInteger = BigInteger(1, bytes)
-                            val hex: String = String.format("%0" + (bytes.size shl 1) + "x", bigInteger)
-
-                            result.success(hex)
-                            return
-                        }
-                    } else {
-                        result.error("ERROR", "Package info is null", null)
-                    }
-                } else {
-                    result.error("ERROR", "Package name is null or blank or activityBinding is null", null)
+                    result.success(hex)
                 }
             } catch (e: Exception) {
                 result.error("ERROR", e.toString(), null)
