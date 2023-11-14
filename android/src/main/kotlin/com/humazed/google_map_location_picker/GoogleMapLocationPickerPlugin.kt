@@ -43,6 +43,9 @@ class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, Activity
                     result.success(hex)
                 }
             } catch (e: Exception) {
+                result.notImplemented()
+                print("ERROR", e.toString(), null)
+                return
                 result.error("ERROR", e.toString(), null)
             }
         } else {
