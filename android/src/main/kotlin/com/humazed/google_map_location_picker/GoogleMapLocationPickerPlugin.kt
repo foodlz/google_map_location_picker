@@ -30,17 +30,22 @@ class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, Activity
         }
         if (call.method == "getSigningCertSha1") {
             try {
-                val packageName = call.arguments<String>()?.takeIf { it.isNotBlank() }
-                val info: PackageInfo = activityBinding!!.activity.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
-                for (signature in info.signatures) {
-                    val md: MessageDigest = MessageDigest.getInstance("SHA1")
-                    md.update(signature.toByteArray())
+                val packageName: String? = call.arguments()
 
-                    val bytes: ByteArray = md.digest()
-                    val bigInteger = BigInteger(1, bytes)
-                    val hex: String = String.format("%0" + (bytes.size shl 1) + "x", bigInteger)
+                if (packageName != null && !packageName.isNullOrBlank()) {
+                    val info: PackageInfo = activityBinding!!.activity.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+                    for (signature in info.signatures) {
+                        val md: MessageDigest = MessageDigest.getInstance("SHA1")
+                        md.update(signature.toByteArray())
 
-                    result.success(hex)
+                        val bytes: ByteArray = md.digest()
+                        val bigInteger = BigInteger(1, bytes)
+                        val hex: String = String.format("%0" + (bytes.size shl 1) + "x", bigInteger)
+
+                        result.success(hex)
+                    }
+                } else {
+                    result.error("ERROR", "Package name is null or blank", null)
                 }
             } catch (e: Exception) {
                 result.error("ERROR", e.toString(), null)
