@@ -22,8 +22,14 @@ class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, Activity
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "google_map_location_picker")
         channel.setMethodCallHandler(this)
     }
-
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+        if (call.method == "getPlatformVersion") {
+            result.success("Android ${android.os.Build.VERSION.RELEASE}")
+        } else {
+            result.notImplemented()
+        }
+    }
+    /*override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         if(activityBinding == null) {
             result.notImplemented()
             return
@@ -47,7 +53,7 @@ class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, Activity
         } else {
             result.notImplemented()
         }
-    }
+    }*/
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
