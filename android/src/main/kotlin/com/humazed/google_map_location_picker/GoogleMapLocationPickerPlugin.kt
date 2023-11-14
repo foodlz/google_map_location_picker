@@ -13,8 +13,8 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import android.content.pm.PackageInfo
 
-class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, ActivityAware  {
-    private lateinit var channel : MethodChannel
+class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
+    private lateinit var channel: MethodChannel
     private var activityBinding: ActivityPluginBinding? = null
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -25,10 +25,11 @@ class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, Activity
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         if (call.method == "getSigningCertSha1") {
             try {
-                val packageName = call.arguments<String>()?.takeIf { it.isNotBlank() }
+                val packageName: String? = call.arguments()
+                val binding: ActivityPluginBinding? = activityBinding
 
-                if (packageName != null && activityBinding != null) {
-                    val info: PackageInfo? = activityBinding!!.activity.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+                if (packageName != null && packageName.isNotBlank() && binding != null) {
+                    val info: PackageInfo? = binding.activity.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
 
                     if (info != null) {
                         for (signature in info.signatures) {
