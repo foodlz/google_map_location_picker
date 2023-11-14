@@ -23,20 +23,12 @@ class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, Activity
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-        if(activityBinding == null) {
-            result.error("ERROR", "Activity binding is null", null)
-            return
-        }
         if (call.method == "getSigningCertSha1") {
             try {
-                val packageName = call.arguments<String>()?.takeIf { it.isNotBlank() } ?: run {
-                    result.error("ERROR", "Package name is null or blank", null)
-                    return
-                }
+                val packageName = call.arguments<String>()?.takeIf { it.isNotBlank() }
 
-                val binding = activityBinding
-                if (binding != null) {
-                    val info: PackageInfo? = binding.activity.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+                if (packageName != null && activityBinding != null) {
+                    val info: PackageInfo? = activityBinding!!.activity.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
 
                     if (info != null) {
                         for (signature in info.signatures) {
@@ -48,12 +40,13 @@ class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, Activity
                             val hex: String = String.format("%0" + (bytes.size shl 1) + "x", bigInteger)
 
                             result.success(hex)
+                            return
                         }
                     } else {
                         result.error("ERROR", "Package info is null", null)
                     }
                 } else {
-                    result.error("ERROR", "Activity binding is null", null)
+                    result.error("ERROR", "Package name is null or blank or activityBinding is null", null)
                 }
             } catch (e: Exception) {
                 result.error("ERROR", e.toString(), null)
