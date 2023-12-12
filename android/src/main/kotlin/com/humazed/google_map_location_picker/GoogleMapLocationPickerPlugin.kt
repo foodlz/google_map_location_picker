@@ -22,21 +22,56 @@ class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, Activity
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "google_map_location_picker")
         channel.setMethodCallHandler(this)
     }
+
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-        if (call.method == "getPlatformVersion") {
-            result.success("Android ${android.os.Build.VERSION.RELEASE}")
-        } else {
-            result.notImplemented()
-        }
-    }
-    /*override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         if(activityBinding == null) {
             result.notImplemented()
             return
         }
-        if (call.method == "getSigningCertSha1") {
+
+        if (call.method == "getPlatformVersion") {
+            result.success("Android ${android.os.Build.VERSION.RELEASE}")
+        } else if (call.method == "getSigningCertSha1") {
             try {
-                val info: PackageInfo = activityBinding!!.activity.packageManager.getPackageInfo(call.arguments<String>(), PackageManager.GET_SIGNATURES)
+                val info: PackageInfo
+
+                /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                    info = activityBinding!!.activity.packageManager.getPackageInfo(call.arguments<String>(), PackageManager.GET_SIGNING_CERTIFICATES)
+                    for (signature in info.signingInfo.apkContentsSigners) {
+                        val md: MessageDigest = MessageDigest.getInstance("SHA1")
+                        md.update(signature.toByteArray())
+
+                        val bytes: ByteArray = md.digest()
+                        val bigInteger = BigInteger(1, bytes)
+                        val hex: String = String.format("%0" + (bytes.size shl 1) + "x", bigInteger)
+
+                        result.success(hex)
+                    }
+                } else {
+                    @Suppress("DEPRECATION")
+                    info = activityBinding!!.activity.packageManager.getPackageInfo(call.arguments<String>(), PackageManager.GET_SIGNATURES)
+                    @Suppress("DEPRECATION")
+                    for (signature in info.signatures) {
+                        val md: MessageDigest = MessageDigest.getInstance("SHA1")
+                        md.update(signature.toByteArray())
+
+                        val bytes: ByteArray = md.digest()
+                        val bigInteger = BigInteger(1, bytes)
+                        val hex: String = String.format("%0" + (bytes.size shl 1) + "x", bigInteger)
+
+                        result.success(hex)
+                    }
+                }*/
+
+            } catch (e: Exception) {
+                result.error("ERROR", e.toString(), null)
+            }
+        } else {
+            result.notImplemented()
+        }
+        /*if (call.method == "getSigningCertSha1") {
+            try {
+                val info: PackageInfo = activityBinding!!.activity.packageManager.getPackageInfo(call.arguments<String?>(), PackageManager.GET_SIGNATURES)
                 for (signature in info.signatures) {
                     val md: MessageDigest = MessageDigest.getInstance("SHA1")
                     md.update(signature.toByteArray())
@@ -52,8 +87,8 @@ class GoogleMapLocationPickerPlugin : FlutterPlugin, MethodCallHandler, Activity
             }
         } else {
             result.notImplemented()
-        }
-    }*/
+        }*/
+    }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)

@@ -35,6 +35,16 @@ class MessageLookup extends MessageLookupByLibrary {
                 "Разрешите доступ к службам определения местоположения для этого приложения в настройках устройства."),
         "cant_get_current_location": MessageLookupByLibrary.simpleMessage(
             "Невозможно получить текущее местоположение"),
+        "location_denied_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "Для использования этой функции нам нужен доступ к вашему местоположению."),
+        "location_limited_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "Доступ к местоположению ограничен. Чтобы полностью использовать эту функцию, рассмотрите возможность обновления настроек местоположения."),
+        "location_permanently_denied_callback_msg":
+            MessageLookupByLibrary.simpleMessage(
+                "Доступ к местоположению запрещен навсегда. Чтобы включить эту функцию, перейдите в настройки вашего устройства и предоставьте разрешение на местоположение."),
+        "location_restricted_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "Доступ к местоположению ограничен. Чтобы использовать эту функцию, убедитесь, что настройки местоположения вашего устройства разрешают доступ."),
+        "mobile_settings": MessageLookupByLibrary.simpleMessage("Настройки"),
         "ok": MessageLookupByLibrary.simpleMessage("ОК"),
         "please_check_your_connection": MessageLookupByLibrary.simpleMessage(
             "Пожалуйста, проверьте ваше соединение"),

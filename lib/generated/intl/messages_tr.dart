@@ -37,6 +37,16 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Geçerli konum alınamıyor"),
         "finding_place":
             MessageLookupByLibrary.simpleMessage("Yer aranıyor..."),
+        "location_denied_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "Bu özelliği kullanmak için konumunuza erişim gerekiyor."),
+        "location_limited_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "Konum erişimi sınırlıdır. Bu özelliği tam anlamıyla kullanmak için konum ayarlarınızı güncellemeyi düşünün."),
+        "location_permanently_denied_callback_msg":
+            MessageLookupByLibrary.simpleMessage(
+                "Konum erişimi kalıcı olarak reddedildi. Bu özelliği etkinleştirmek için cihaz ayarlarına gidin ve konum izni verin."),
+        "location_restricted_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "Konum erişimi sınırlıdır. Bu özelliği kullanmak için cihazınızın konum ayarlarının erişime izin verildiğinden emin olun."),
+        "mobile_settings": MessageLookupByLibrary.simpleMessage("Ayarlar"),
         "no_result_found":
             MessageLookupByLibrary.simpleMessage("Sonuç Bulunamadı"),
         "ok": MessageLookupByLibrary.simpleMessage("Tamam"),

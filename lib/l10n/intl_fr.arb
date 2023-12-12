@@ -12,5 +12,11 @@
   "search_place": "Rechercher un lieu",
   "finding_place": "En train de trouver un lieu...",
   "no_result_found": "Aucun résultat trouvé",
-  "unnamedPlace": "Luogo senza nome"
+  "unnamedPlace": "Luogo senza nome",
+  "mobile_settings": "Paramètres",
+  "location_denied_callback_msg": "Pour utiliser cette fonctionnalité, nous avons besoin d'accéder à votre emplacement.",
+  "location_permanently_denied_callback_msg": "L'accès à l'emplacement est définitivement refusé. Pour activer cette fonctionnalité, rendez-vous dans les paramètres de votre appareil et accordez les autorisations d'emplacement.",
+  "location_restricted_callback_msg": "L'accès à l'emplacement est restreint. Pour utiliser cette fonctionnalité, assurez-vous que les paramètres de localisation de votre appareil autorisent l'accès.",
+  "location_limited_callback_msg": "L'accès à l'emplacement est limité. Pour utiliser pleinement cette fonctionnalité, envisagez de mettre à jour les paramètres de localisation."
+
 }

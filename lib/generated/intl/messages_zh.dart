@@ -33,6 +33,17 @@ class MessageLookup extends MessageLookupByLibrary {
         "cant_get_current_location":
             MessageLookupByLibrary.simpleMessage("无法获取当前位置"),
         "finding_place": MessageLookupByLibrary.simpleMessage("找地方..."),
+        "location_denied_callback_msg":
+            MessageLookupByLibrary.simpleMessage("为了使用此功能，我们需要访问您的位置。"),
+        "location_limited_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "位置访问受限。要充分使用此功能，请考虑更新您的位置设置。"),
+        "location_permanently_denied_callback_msg":
+            MessageLookupByLibrary.simpleMessage(
+                "位置访问已被永久拒绝。要启用此功能，请转到您设备的设置并授予位置权限。"),
+        "location_restricted_callback_msg":
+            MessageLookupByLibrary.simpleMessage(
+                "位置访问受限。要使用此功能，请确保您设备的位置设置配置允许访问。"),
+        "mobile_settings": MessageLookupByLibrary.simpleMessage("设置"),
         "no_result_found": MessageLookupByLibrary.simpleMessage("未找到结果"),
         "ok": MessageLookupByLibrary.simpleMessage("好的"),
         "please_check_your_connection":

@@ -12,5 +12,11 @@
   "search_place": "Search place",
   "finding_place": "Finding place...",
   "no_result_found": "No result found",
-  "unnamedPlace": "Unnamed place"
+  "unnamedPlace": "Unnamed place",
+  "mobile_settings": "Settings",
+  "location_denied_callback_msg": "To use this feature, we require access to your location.",
+  "location_permanently_denied_callback_msg": "Location access is permanently denied. To enable this feature, go to your device settings and grant location permission.",
+  "location_restricted_callback_msg": "Location access is restricted. To use this feature, ensure that your device's location settings are configured to allow access.",
+  "location_limited_callback_msg": "Location access is limited. To use this feature fully, consider updating your location settings."
+
 }

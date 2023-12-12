@@ -12,5 +12,11 @@
   "search_place": "Buscar lugar",
   "finding_place": "Buscando lugar ...",
   "no_result_found": "No se encontraron resultados",
-  "unnamedPlace": "Lugar sin nombre"
+  "unnamedPlace": "Lugar sin nombre",
+  "mobile_settings": "Configuración",
+  "location_denied_callback_msg": "Para utilizar esta función, necesitamos acceso a tu ubicación.",
+  "location_permanently_denied_callback_msg": "El acceso a la ubicación se ha denegado de forma permanente. Para habilitar esta función, ve a la configuración de tu dispositivo y concede permisos de ubicación.",
+  "location_restricted_callback_msg": "El acceso a la ubicación está restringido. Para utilizar esta función, asegúrate de que la configuración de ubicación de tu dispositivo permita el acceso.",
+  "location_limited_callback_msg": "El acceso a la ubicación está limitado. Para utilizar completamente esta función, considera actualizar la configuración de ubicación."
+
 }

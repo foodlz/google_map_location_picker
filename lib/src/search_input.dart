@@ -44,6 +44,10 @@ class SearchInputState extends State<SearchInput> {
   }
 
   void onSearchInputChange() {
+
+    print("Mounted? ${mounted.toString()}");
+    if (!mounted) return;
+
     if (editController.text.isEmpty) {
       debouncer?.cancel();
       widget.onSearchInput(editController.text);
@@ -54,7 +58,7 @@ class SearchInputState extends State<SearchInput> {
       debouncer!.cancel();
     }
 
-    debouncer = Timer(Duration(milliseconds: 500), () {
+    debouncer = Timer(Duration(milliseconds: 600), () {
       widget.onSearchInput(editController.text);
     });
   }

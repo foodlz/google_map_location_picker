@@ -1,5 +1,5 @@
 // DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
-// This is a library that provides messages for a it locale. All the
+// This is a library that provides messages for a pl locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
 
@@ -18,47 +18,47 @@ final messages = new MessageLookup();
 typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 
 class MessageLookup extends MessageLookupByLibrary {
-  String get localeName => 'it';
+  String get localeName => 'pl';
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "access_to_location_denied": MessageLookupByLibrary.simpleMessage(
-            "Accesso alla posizione rifiutato"),
+            "Odmówiono dostępu do lokalizacji"),
         "access_to_location_permanently_denied":
             MessageLookupByLibrary.simpleMessage(
-                "Accesso alla posizione rifiutato permanentemente"),
+                "Odmówiono dostępu do lokalizacji na stałe"),
         "allow_access_to_the_location_services":
             MessageLookupByLibrary.simpleMessage(
-                "Permetti l\'accesso ai servizi di localizzazione."),
+                "Zezwól na dostęp do usług lokalizacyjnych."),
         "allow_access_to_the_location_services_from_settings":
             MessageLookupByLibrary.simpleMessage(
-                "Consenti l\'accesso ai servizi di localizzazione per questa app utilizzando le impostazioni del dispositivo."),
+                "Zezwól na dostęp do usług lokalizacyjnych dla tej aplikacji, korzystając z ustawień urządzenia."),
         "cant_get_current_location": MessageLookupByLibrary.simpleMessage(
-            "Impossibile ottenere la posizione attuale"),
+            "Nie można uzyskać bieżącej lokalizacji"),
         "finding_place":
-            MessageLookupByLibrary.simpleMessage("Cercando il luogo..."),
+            MessageLookupByLibrary.simpleMessage("Wyszukiwanie miejsca..."),
         "location_denied_callback_msg": MessageLookupByLibrary.simpleMessage(
-            "Per utilizzare questa funzione, abbiamo bisogno dell\'accesso alla tua posizione."),
+            "Aby skorzystać z tej funkcji, wymagamy dostępu do Twojej lokalizacji."),
         "location_limited_callback_msg": MessageLookupByLibrary.simpleMessage(
-            "L\'accesso alla posizione è limitato. Per utilizzare appieno questa funzione, considera di aggiornare le impostazioni di localizzazione."),
+            "Dostęp do lokalizacji jest ograniczony. Aby pełni korzystać z tej funkcji, rozważ aktualizację ustawień lokalizacyjnych."),
         "location_permanently_denied_callback_msg":
             MessageLookupByLibrary.simpleMessage(
-                "L\'accesso alla posizione è stato permanentemente negato. Per abilitare questa funzione, vai nelle impostazioni del tuo dispositivo e concedi il permesso di posizione."),
+                "Dostęp do lokalizacji jest trwale zablokowany. Aby włączyć tę funkcję, przejdź do ustawień urządzenia i udziel zgody na lokalizację."),
         "location_restricted_callback_msg": MessageLookupByLibrary.simpleMessage(
-            "L\'accesso alla posizione è limitato. Per utilizzare questa funzione, assicurati che le impostazioni di localizzazione del tuo dispositivo consentano l\'accesso."),
-        "mobile_settings": MessageLookupByLibrary.simpleMessage("Impostazioni"),
+            "Dostęp do lokalizacji jest ograniczony. Aby skorzystać z tej funkcji, upewnij się, że ustawienia lokalizacji Twojego urządzenia pozwalają na dostęp."),
+        "mobile_settings": MessageLookupByLibrary.simpleMessage("Ustawienia"),
         "no_result_found":
-            MessageLookupByLibrary.simpleMessage("Nessun risultato trovato"),
+            MessageLookupByLibrary.simpleMessage("Nie znaleziono wyników"),
         "ok": MessageLookupByLibrary.simpleMessage("Ok"),
-        "please_check_your_connection": MessageLookupByLibrary.simpleMessage(
-            "Controlla la tua connessione di rete"),
+        "please_check_your_connection":
+            MessageLookupByLibrary.simpleMessage("Proszę sprawdzić połączenie"),
         "please_make_sure_you_enable_gps_and_try_again":
             MessageLookupByLibrary.simpleMessage(
-                "Assicurati di aver attivato il GPS e prova di nuovo"),
-        "search_place": MessageLookupByLibrary.simpleMessage("Ricerca luogo"),
-        "server_error":
-            MessageLookupByLibrary.simpleMessage("Errore del server"),
+                "Upewnij się, że włączyłeś GPS i spróbuj ponownie"),
+        "search_place":
+            MessageLookupByLibrary.simpleMessage("Wyszukaj miejsce"),
+        "server_error": MessageLookupByLibrary.simpleMessage("Błąd serwera"),
         "unnamedPlace":
-            MessageLookupByLibrary.simpleMessage("Località senza nome")
+            MessageLookupByLibrary.simpleMessage("Miejsce bez nazwy")
       };
 }

@@ -5,13 +5,15 @@ class LocationResult {
   /// The human readable name of the location. This is primarily the
   /// name of the road. But in cases where the place was selected from Nearby
   /// places list, we use the <b>name</b> provided on the list item.
-  String? address; // or road
+  String? address;
 
   /// Google Maps place ID
   String? placeId;
 
   /// Latitude/Longitude of the selected location.
   LatLng? latLng;
+
+  String? subPremise;
 
   String? streetNumber;
 
@@ -33,6 +35,7 @@ class LocationResult {
     this.latLng,
     this.address,
     this.placeId,
+    this.subPremise,
     this.streetNumber,
     this.routeName,
     this.localityName,
@@ -45,6 +48,6 @@ class LocationResult {
 
   @override
   String toString() {
-    return 'LocationResult{address: $address, latLng: $latLng, placeId: $placeId, streetNumber: $streetNumber, routeName: $routeName, localityName: $localityName, administrativeAreaLevel1: $administrativeAreaLevel1, administrativeAreaLevel2: $administrativeAreaLevel2, administrativeAreaLevel3: $administrativeAreaLevel3, countryName: $countryName, postalCode: $postalCode}';
+    return 'LocationResult{address: $address, latLng: $latLng, placeId: $placeId, subPremise: $subPremise, streetNumber: $streetNumber, routeName: $routeName, localityName: $localityName, administrativeAreaLevel1: $administrativeAreaLevel1, administrativeAreaLevel2: $administrativeAreaLevel2, administrativeAreaLevel3: $administrativeAreaLevel3, countryName: $countryName, postalCode: $postalCode}';
   }
 }

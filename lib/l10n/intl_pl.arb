@@ -1,0 +1,21 @@
+{
+  "@@locale": "pl",
+  "please_check_your_connection": "Proszę sprawdzić połączenie",
+  "server_error": "Błąd serwera",
+  "access_to_location_denied": "Odmówiono dostępu do lokalizacji",
+  "allow_access_to_the_location_services": "Zezwól na dostęp do usług lokalizacyjnych.",
+  "access_to_location_permanently_denied": "Odmówiono dostępu do lokalizacji na stałe",
+  "allow_access_to_the_location_services_from_settings": "Zezwól na dostęp do usług lokalizacyjnych dla tej aplikacji, korzystając z ustawień urządzenia.",
+  "ok": "Ok",
+  "cant_get_current_location": "Nie można uzyskać bieżącej lokalizacji",
+  "please_make_sure_you_enable_gps_and_try_again": "Upewnij się, że włączyłeś GPS i spróbuj ponownie",
+  "search_place": "Wyszukaj miejsce",
+  "finding_place": "Wyszukiwanie miejsca...",
+  "no_result_found": "Nie znaleziono wyników",
+  "unnamedPlace": "Miejsce bez nazwy",
+  "mobile_settings": "Ustawienia",
+  "location_denied_callback_msg": "Aby skorzystać z tej funkcji, wymagamy dostępu do Twojej lokalizacji.",
+  "location_permanently_denied_callback_msg": "Dostęp do lokalizacji jest trwale zablokowany. Aby włączyć tę funkcję, przejdź do ustawień urządzenia i udziel zgody na lokalizację.",
+  "location_restricted_callback_msg": "Dostęp do lokalizacji jest ograniczony. Aby skorzystać z tej funkcji, upewnij się, że ustawienia lokalizacji Twojego urządzenia pozwalają na dostęp.",
+  "location_limited_callback_msg": "Dostęp do lokalizacji jest ograniczony. Aby pełni korzystać z tej funkcji, rozważ aktualizację ustawień lokalizacyjnych."
+}

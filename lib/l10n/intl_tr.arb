@@ -12,5 +12,11 @@
   "search_place": "Konum ara",
   "finding_place": "Yer aranıyor...",
   "no_result_found": "Sonuç Bulunamadı" ,
-  "unnamedPlace": "Adsız yer"
+  "unnamedPlace": "Adsız yer",
+  "mobile_settings": "Ayarlar",
+  "location_denied_callback_msg": "Bu özelliği kullanmak için konumunuza erişim gerekiyor.",
+  "location_permanently_denied_callback_msg": "Konum erişimi kalıcı olarak reddedildi. Bu özelliği etkinleştirmek için cihaz ayarlarına gidin ve konum izni verin.",
+  "location_restricted_callback_msg": "Konum erişimi sınırlıdır. Bu özelliği kullanmak için cihazınızın konum ayarlarının erişime izin verildiğinden emin olun.",
+  "location_limited_callback_msg": "Konum erişimi sınırlıdır. Bu özelliği tam anlamıyla kullanmak için konum ayarlarınızı güncellemeyi düşünün."
+
 }

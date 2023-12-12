@@ -31,6 +31,16 @@ class MessageLookup extends MessageLookupByLibrary {
             "Ne možemo da pristupimo Vašoj lokaciji, pokušajte ponovo"),
         "finding_place":
             MessageLookupByLibrary.simpleMessage("Pronalaženje mesta ..."),
+        "location_denied_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "Да бисте користили ову функцију, потребан нам је приступ вашој локацији."),
+        "location_limited_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "Приступ локацији је ограничен. Да бисте потпуно користили ову функцију, размислите о ажурирању поставки локације."),
+        "location_permanently_denied_callback_msg":
+            MessageLookupByLibrary.simpleMessage(
+                "Приступ локацији трајно је одбијен. Да бисте омогућили ову функцију, идите у подешавања вашег уређаја и доделите дозволу за локацију."),
+        "location_restricted_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "Приступ локацији је ограничен. Да бисте користили ову функцију, проверите да ли су поставке локације вашег уређаја конфигурисане да омогуће приступ."),
+        "mobile_settings": MessageLookupByLibrary.simpleMessage("Поставке"),
         "no_result_found":
             MessageLookupByLibrary.simpleMessage("Nema rezultata"),
         "ok": MessageLookupByLibrary.simpleMessage("U redu"),

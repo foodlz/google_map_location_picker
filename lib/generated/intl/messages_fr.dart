@@ -37,6 +37,16 @@ class MessageLookup extends MessageLookupByLibrary {
             "Impossible d\'obtenir l\'emplacement actuel"),
         "finding_place": MessageLookupByLibrary.simpleMessage(
             "En train de trouver un lieu..."),
+        "location_denied_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "Pour utiliser cette fonctionnalité, nous avons besoin d\'accéder à votre emplacement."),
+        "location_limited_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "L\'accès à l\'emplacement est limité. Pour utiliser pleinement cette fonctionnalité, envisagez de mettre à jour les paramètres de localisation."),
+        "location_permanently_denied_callback_msg":
+            MessageLookupByLibrary.simpleMessage(
+                "L\'accès à l\'emplacement est définitivement refusé. Pour activer cette fonctionnalité, rendez-vous dans les paramètres de votre appareil et accordez les autorisations d\'emplacement."),
+        "location_restricted_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "L\'accès à l\'emplacement est restreint. Pour utiliser cette fonctionnalité, assurez-vous que les paramètres de localisation de votre appareil autorisent l\'accès."),
+        "mobile_settings": MessageLookupByLibrary.simpleMessage("Paramètres"),
         "no_result_found":
             MessageLookupByLibrary.simpleMessage("Aucun résultat trouvé"),
         "ok": MessageLookupByLibrary.simpleMessage("D\'accord"),

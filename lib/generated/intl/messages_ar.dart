@@ -36,6 +36,16 @@ class MessageLookup extends MessageLookupByLibrary {
         "cant_get_current_location": MessageLookupByLibrary.simpleMessage(
             "لا يمكن الحصول علي الموقع الجغرافي الحالي"),
         "finding_place": MessageLookupByLibrary.simpleMessage("جاري البحث..."),
+        "location_denied_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "لاستخدام هذه الميزة، نحن بحاجة إلى الوصول إلى موقعك."),
+        "location_limited_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "تم تحديد وصول الموقع. لاستخدام هذه الميزة بشكل كامل، يُفضل تحديث إعدادات الموقع."),
+        "location_permanently_denied_callback_msg":
+            MessageLookupByLibrary.simpleMessage(
+                "تم رفض وصول الموقع بشكل دائم. لتمكين هذه الميزة، انتقل إلى إعدادات جهازك وامنح إذن الوصول إلى الموقع."),
+        "location_restricted_callback_msg": MessageLookupByLibrary.simpleMessage(
+            "تم تقييد وصول الموقع. لاستخدام هذه الميزة، تأكد من إعدادات الموقع على جهازك للسماح بالوصول."),
+        "mobile_settings": MessageLookupByLibrary.simpleMessage("الإعدادات"),
         "no_result_found":
             MessageLookupByLibrary.simpleMessage("لم يتم العثور على نتائج"),
         "ok": MessageLookupByLibrary.simpleMessage("حسنا"),

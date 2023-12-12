@@ -12,5 +12,11 @@
   "search_place": "搜索地点",
   "finding_place": "找地方...",
   "no_result_found": "未找到结果",
-  "unnamedPlace": "未命名的地方"
+  "unnamedPlace": "未命名的地方",
+  "mobile_settings": "设置",
+  "location_denied_callback_msg": "为了使用此功能，我们需要访问您的位置。",
+  "location_permanently_denied_callback_msg": "位置访问已被永久拒绝。要启用此功能，请转到您设备的设置并授予位置权限。",
+  "location_restricted_callback_msg": "位置访问受限。要使用此功能，请确保您设备的位置设置配置允许访问。",
+  "location_limited_callback_msg": "位置访问受限。要充分使用此功能，请考虑更新您的位置设置。"
+
 }

@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:geolocator/geolocator.dart';
 import 'package:google_map_location_picker/generated/l10n.dart';
 import 'package:google_map_location_picker/src/providers/location_provider.dart';
@@ -13,9 +10,10 @@ import 'package:google_map_location_picker/src/utils/log.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-
 import 'model/location_result.dart';
 import 'utils/location_utils.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 
 class MapPicker extends StatefulWidget {
   const MapPicker(
@@ -40,17 +38,13 @@ class MapPicker extends StatefulWidget {
   }) : super(key: key);
 
   final String apiKey;
-
   final LatLng? initialCenter;
   final double? initialZoom;
-
   final bool? requiredGPS;
   final bool? myLocationButtonEnabled;
   final bool? layersButtonEnabled;
   final bool? automaticallyAnimateToCurrentLocation;
-
   final String? mapStylePath;
-
   final Color? appBarColor;
   final BoxDecoration? searchBarBoxDecoration;
   final String? hintText;
@@ -58,9 +52,7 @@ class MapPicker extends StatefulWidget {
   final Alignment? resultCardAlignment;
   final Decoration? resultCardDecoration;
   final EdgeInsets? resultCardPadding;
-
   final String? language;
-
   final LocationAccuracy? desiredAccuracy;
 
   @override
@@ -68,52 +60,46 @@ class MapPicker extends StatefulWidget {
 }
 
 class MapPickerState extends State<MapPicker> {
+  Map<String, String>? _headers;
   Completer<GoogleMapController> mapController = Completer();
 
   MapType _currentMapType = MapType.normal;
-
   String? _mapStyle;
-
   LatLng? _lastMapPosition;
-
   Position? _currentPosition;
-
   String? _address;
-
   String? _placeId;
-
+  String? _aptNumber;
   String? _streetNumber;
-
   String? _routeName;
-
   String? _localityName;
-
   String? _administrativeAreaLevel1;
-
   String? _administrativeAreaLevel2;
-
   String? _administrativeAreaLevel3;
-
   String? _countryName;
-
   String? _postalCode;
+  String? autoCompletePlaceId;
+  Map<String, dynamic>? autoCompleteDetails;
+
+  Future<void> getHeaders() async {
+    final headers = await LocationUtils.getAppHeaders();
+    setState(() => _headers = headers);
+  }
 
   void _onToggleMapTypePressed() {
-    final MapType nextType =
-        MapType.values[(_currentMapType.index + 1) % MapType.values.length];
-
+    final MapType nextType = MapType.values[(_currentMapType.index + 1) % MapType.values.length];
     setState(() => _currentMapType = nextType);
   }
 
-  // this also checks for location permission.
+  // This also checks for location permission.
   Future<void> _initCurrentLocation() async {
-    Position? currentPosition;
-    try {
-      currentPosition = await Geolocator.getCurrentPosition(
-          desiredAccuracy: widget.desiredAccuracy!);
-      d("position = $currentPosition");
 
-      setState(() => _currentPosition = currentPosition);
+    if (!mounted) return;
+
+    Position? currentPosition;
+
+    try {
+      currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: widget.desiredAccuracy!);
     } catch (e) {
       currentPosition = null;
       d("_initCurrentLocation#e = $e");
@@ -123,22 +109,44 @@ class MapPickerState extends State<MapPicker> {
 
     setState(() => _currentPosition = currentPosition);
 
-    if (currentPosition != null)
-      moveToCurrentLocation(
-          LatLng(currentPosition.latitude, currentPosition.longitude));
+    if (currentPosition != null) {
+
+      LatLng newLocation = LatLng(currentPosition.latitude, currentPosition.longitude);
+
+      // Check if the new location is significantly different from the last known map position
+      //     0.0001 degrees of latitude ≈ 11.1 meters
+      //     0.0001 degrees of longitude ≈ 7.8 meters
+      if (_lastMapPosition == null ||
+          (newLocation.latitude - _lastMapPosition!.latitude).abs() > 0.00001 &&
+              (newLocation.longitude - _lastMapPosition!.longitude).abs() > 0.00001) {
+        await moveToCurrentLocation(newLocation);
+      } else {
+        d('The new location is not significantly different. Cancel moveToCurrentLocation');
+      }
+
+    }
+
   }
 
-  Future moveToCurrentLocation(LatLng currentLocation) async {
-    d('MapPickerState.moveToCurrentLocation "currentLocation = [$currentLocation]"');
+  Future moveToCurrentLocation(LatLng currentLocation, {String? placeId, placeDetails}) async {
     final controller = await mapController.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(target: currentLocation, zoom: 16),
+    if(placeId != null) {
+      autoCompletePlaceId = placeId;
+      autoCompleteDetails = placeDetails;
+    } else {
+      autoCompletePlaceId = null;
+      autoCompleteDetails = null;
+    }
+    await controller.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(target: currentLocation, zoom: widget.initialZoom!),
     ));
   }
 
   @override
   void initState() {
     super.initState();
+    getHeaders();
+
     if (widget.automaticallyAnimateToCurrentLocation! && !widget.requiredGPS!)
       _initCurrentLocation();
 
@@ -167,7 +175,6 @@ class MapPickerState extends State<MapPicker> {
               widget.requiredGPS!) {
             return const Center(child: CircularProgressIndicator());
           }
-
           return buildMap();
         },
       ),
@@ -179,7 +186,7 @@ class MapPickerState extends State<MapPicker> {
       child: Stack(
         children: <Widget>[
           GoogleMap(
-            myLocationButtonEnabled: false,
+            myLocationButtonEnabled: true,
             initialCameraPosition: CameraPosition(
               target: widget.initialCenter!,
               zoom: widget.initialZoom!,
@@ -190,25 +197,25 @@ class MapPickerState extends State<MapPicker> {
               if (widget.mapStylePath != null) {
                 controller.setMapStyle(_mapStyle);
               }
-
               _lastMapPosition = widget.initialCenter;
-              LocationProvider.of(context, listen: false)
-                  .setLastIdleLocation(_lastMapPosition);
+              if(!widget.automaticallyAnimateToCurrentLocation!) {
+                LocationProvider.of(context, listen: false)
+                    .setLastIdleLocation(_lastMapPosition);
+              }
             },
             onCameraMove: (CameraPosition position) {
               _lastMapPosition = position.target;
             },
             onCameraIdle: () async {
-              print("onCameraIdle#_lastMapPosition = $_lastMapPosition");
               LocationProvider.of(context, listen: false)
                   .setLastIdleLocation(_lastMapPosition);
             },
             onCameraMoveStarted: () {
-              print("onCameraMoveStarted#_lastMapPosition = $_lastMapPosition");
+              //d("onCameraMoveStarted#_lastMapPosition = $_lastMapPosition");
             },
-//            onTap: (latLng) {
-//              clearOverlay();
-//            },
+            //onTap: (latLng) {
+            //  clearOverlay();
+            //},
             mapType: _currentMapType,
             myLocationEnabled: true,
           ),
@@ -271,6 +278,7 @@ class MapPickerState extends State<MapPicker> {
                           latLng: locationProvider.lastIdleLocation,
                           address: _address,
                           placeId: _placeId,
+                          subPremise: _aptNumber,
                           streetNumber: _streetNumber,
                           routeName: _routeName,
                           localityName: _localityName,
@@ -295,63 +303,200 @@ class MapPickerState extends State<MapPicker> {
   }
 
   Future<Map<String, String?>> getAddress(LatLng? location) async {
+
     try {
-      final endpoint =
-          'https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}'
+
+      final endpoint = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}'
           '&key=${widget.apiKey}&language=${widget.language}';
 
-      final response = jsonDecode((await http.get(Uri.parse(endpoint),
-              headers: await LocationUtils.getAppHeaders()))
-          .body);
+      if(location?.latitude == null || location?.longitude == null) {
+        return {"placeId": null, "address": null, "streetNumber": null, "routeName": null, "localityName": null, "administrativeAreaLevel3": null, "administrativeAreaLevel2": null, "administrativeAreaLevel1": null, "countryName": null, "postalCode": null};
+      }
 
-      List<dynamic>? addressComponents = response['results'][0]['address_components'];
-      addressComponents?.forEach((addressComponents) {
-        String type = addressComponents['types'][0].toString();
-        switch (type) {
-          case 'street_number':
-            _streetNumber = addressComponents['long_name'].toString();
-            break;
-          case 'route':
-            _routeName = addressComponents['long_name'].toString();
-            break;
-          case 'locality':
-            _localityName = addressComponents['long_name'].toString();
-            break;
-          case 'administrative_area_level_3':
-            _administrativeAreaLevel3 = addressComponents['long_name'].toString();
-            break;
-          case 'administrative_area_level_2':
-            _administrativeAreaLevel2 = addressComponents['long_name'].toString();
-            break;
-          case 'administrative_area_level_1':
-            _administrativeAreaLevel1 = addressComponents['long_name'].toString();
-            break;
-          case 'country':
-            _countryName = addressComponents['long_name'].toString();
-            break;
-          case 'postal_code':
-            _postalCode = addressComponents['long_name'].toString();
-            break;
-          default:
-            break;
+      if(autoCompletePlaceId != null && autoCompleteDetails != null) {
+
+        autoCompleteDetails!['address_components']?.forEach((addressComponents) {
+          String type = addressComponents['types'][0].toString();
+          switch (type) {
+            case 'subpremise':
+              _aptNumber = addressComponents['long_name'].toString();
+              d("aptNumber: $_aptNumber");
+              break;
+            case 'street_number':
+              _streetNumber = addressComponents['long_name'].toString();
+              d("streetNumber: $_streetNumber");
+              break;
+            case 'route': // Street
+              _routeName = addressComponents['long_name'].toString();
+              d("routeName: $_routeName");
+              break;
+            case 'locality': // City
+              _localityName = addressComponents['long_name'].toString();
+              d("localityName: $_localityName");
+              break;
+            case 'administrative_area_level_3':
+              _administrativeAreaLevel3 = addressComponents['long_name'].toString();
+              d("administrativeAreaLevel3: $_administrativeAreaLevel3");
+              break;
+            case 'administrative_area_level_2':
+              _administrativeAreaLevel2 = addressComponents['long_name'].toString();
+              d("administrativeAreaLevel2: $_administrativeAreaLevel2");
+              break;
+            case 'administrative_area_level_1': // State
+              _administrativeAreaLevel1 = addressComponents['long_name'].toString();
+              d("administrativeAreaLevel1: $_administrativeAreaLevel1");
+              break;
+            case 'country':
+              _countryName = addressComponents['long_name'].toString();
+              d("countryName: $_countryName");
+              break;
+            case 'postal_code':
+              _postalCode = addressComponents['long_name'].toString();
+              d("postalCode: $_postalCode");
+              break;
+            default:
+              break;
+          }
+        });
+
+
+        String? placeId = autoCompletePlaceId;
+        String? formattedAddress = autoCompleteDetails!['formatted_address'];
+        Future.delayed(const Duration(seconds: 2), () {
+          autoCompletePlaceId = null;
+          autoCompleteDetails = null;
+        });
+
+        return {
+          "placeId": placeId,
+          "address": formattedAddress,
+          "subPremise":  _aptNumber,
+          "streetNumber": _streetNumber,
+          "routeName": _routeName,
+          "localityName": _localityName,
+          "administrativeAreaLevel3": _administrativeAreaLevel3,
+          "administrativeAreaLevel2": _administrativeAreaLevel2,
+          "administrativeAreaLevel1": _administrativeAreaLevel1,
+          "countryName": _countryName,
+          "postalCode": _postalCode,
+          "lat": location?.latitude.toString(),
+          "lng": location?.longitude.toString()
+        };
+
+      }
+
+      final response = await http.get(Uri.parse(endpoint),
+          headers: _headers);
+
+      if (response.statusCode == 200) {
+
+        d(_headers.toString());
+
+        Map<String, dynamic> responseJson = jsonDecode(response.body);
+        d(responseJson);
+        List<dynamic> results = responseJson['results'];
+        List<dynamic>? addressComponents;
+        Map<String, dynamic>? matchingResult;
+
+        if (responseJson['status'] == 'REQUEST_DENIED') {
+          d(responseJson['error_message']);
+          return {"placeId": null, "address": null, "streetNumber": null, "routeName": null, "localityName": null, "administrativeAreaLevel3": null, "administrativeAreaLevel2": null, "administrativeAreaLevel1": null, "countryName": null, "postalCode": null};
         }
-      });
 
-      return {
-        "placeId": response['results'][0]['place_id'],
-        "address": response['results'][0]['formatted_address'],
-        "streetNumber": _streetNumber,
-        "routeName": _routeName,
-        "localityName": _localityName,
-        "administrativeAreaLevel3": _administrativeAreaLevel3,
-        "administrativeAreaLevel2": _administrativeAreaLevel2,
-        "administrativeAreaLevel1": _administrativeAreaLevel1,
-        "countryName": _countryName,
-        "postalCode": _postalCode,
-      };
+        d("auto Complete PlaceId $autoCompletePlaceId");
+
+        if(autoCompletePlaceId != null) {
+          for (var result in results) {
+            if (result['place_id'] == autoCompletePlaceId) {
+              matchingResult = result;
+              break;
+            }
+          }
+        }
+
+        if (matchingResult != null) {
+          d('Matching result: $matchingResult');
+          addressComponents = matchingResult['address_components'];
+          d('addressComponents: $addressComponents');
+        } else {
+          matchingResult = results[0];
+          addressComponents = matchingResult!['address_components'];
+          d('addressComponents: $addressComponents');
+        }
+
+        autoCompletePlaceId = null;
+
+        addressComponents?.forEach((addressComponents) {
+          String type = addressComponents['types'][0].toString();
+          switch (type) {
+            case 'subpremise':
+              _aptNumber = addressComponents['long_name'].toString();
+              d("aptNumber: $_aptNumber");
+              break;
+            case 'street_number':
+              _streetNumber = addressComponents['long_name'].toString();
+              d("streetNumber: $_streetNumber");
+              break;
+            case 'route': // Street
+              _routeName = addressComponents['long_name'].toString();
+              d("routeName: $_routeName");
+              break;
+            case 'locality': // City
+              _localityName = addressComponents['long_name'].toString();
+              d("localityName: $_localityName");
+              break;
+            case 'administrative_area_level_3':
+              _administrativeAreaLevel3 = addressComponents['long_name'].toString();
+              d("administrativeAreaLevel3: $_administrativeAreaLevel3");
+              break;
+            case 'administrative_area_level_2':
+              _administrativeAreaLevel2 = addressComponents['long_name'].toString();
+              d("administrativeAreaLevel2: $_administrativeAreaLevel2");
+              break;
+            case 'administrative_area_level_1': // State
+              _administrativeAreaLevel1 = addressComponents['long_name'].toString();
+              d("administrativeAreaLevel1: $_administrativeAreaLevel1");
+              break;
+            case 'country':
+              _countryName = addressComponents['long_name'].toString();
+              d("countryName: $_countryName");
+              break;
+            case 'postal_code':
+              _postalCode = addressComponents['long_name'].toString();
+              d("postalCode: $_postalCode");
+              break;
+            default:
+              break;
+          }
+        });
+
+        return {
+          "placeId": matchingResult['place_id'],
+          "address": matchingResult['formatted_address'],
+          "subPremise": _aptNumber,
+          "streetNumber": _streetNumber,
+          "routeName": _routeName,
+          "localityName": _localityName,
+          "administrativeAreaLevel3": _administrativeAreaLevel3,
+          "administrativeAreaLevel2": _administrativeAreaLevel2,
+          "administrativeAreaLevel1": _administrativeAreaLevel1,
+          "countryName": _countryName,
+          "postalCode": _postalCode,
+          "lat": matchingResult['geometry']['location']['lat'].toString(),
+          "lng": matchingResult['geometry']['location']['lng'].toString()
+        };
+
+      } else {
+        // Handle non-200 status code
+        d('Error: ${response.statusCode}');
+      }
+
     } catch (e) {
+      autoCompletePlaceId = null;
       print(e);
     }
+
+    autoCompletePlaceId = null;
 
     return {"placeId": null, "address": null, "streetNumber": null, "routeName": null, "localityName": null, "administrativeAreaLevel3": null, "administrativeAreaLevel2": null, "administrativeAreaLevel1": null, "countryName": null, "postalCode": null};
   }
@@ -389,7 +534,70 @@ class MapPickerState extends State<MapPicker> {
   var dialogOpen;
 
   Future _checkGeolocationPermission() async {
-    final geolocationStatus = await Geolocator.checkPermission();
+
+    await Permission.locationWhenInUse
+        .onDeniedCallback(() {
+      // We haven't asked for permission yet or the permission has been denied before, but not permanently.
+      _showDeniedDialog();
+    })
+        .onGrantedCallback(() {
+      d("onGrantedCallback");
+    })
+        .onPermanentlyDeniedCallback(() {
+      // The user opted to never again see the permission request dialog for this
+      // app. The only way to change the permission's status now is to let the
+      // user manually enables it in the system settings.
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S
+                .of(context)
+                .location_permanently_denied_callback_msg),
+            duration: Duration(seconds: 30),
+            action: SnackBarAction(
+              label: S.of(context).mobile_settings,
+              onPressed: () {
+                openAppSettings();
+              },
+            ),
+          )
+      );
+      _showDeniedForeverDialog();
+    })
+        .onRestrictedCallback(() {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S
+                .of(context)
+                .location_restricted_callback_msg),
+            duration: Duration(seconds: 30),
+            action: SnackBarAction(
+              label: S.of(context).mobile_settings,
+              onPressed: () {
+                openAppSettings();
+              },
+            ),
+          )
+      );
+    })
+        .onLimitedCallback(() {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S
+                .of(context)
+                .location_limited_callback_msg),
+            duration: Duration(seconds: 30),
+            action: SnackBarAction(
+              label: S.of(context).mobile_settings,
+              onPressed: () {
+                openAppSettings();
+              },
+            ),
+          )
+      );
+    })
+    .request();
+
+    /*final geolocationStatus = await Geolocator.checkPermission();
     d("geolocationStatus = $geolocationStatus");
 
     if (geolocationStatus == LocationPermission.denied && dialogOpen == null) {
@@ -405,7 +613,7 @@ class MapPickerState extends State<MapPicker> {
         Navigator.of(context, rootNavigator: true).pop();
         dialogOpen = null;
       }
-    }
+    }*/
   }
 
   Future _showDeniedDialog() {

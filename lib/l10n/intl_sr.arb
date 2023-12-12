@@ -9,6 +9,12 @@
   "please_make_sure_you_enable_gps_and_try_again": "Proverite da li ste omogućili GPS i pokušajte ponovo",
   "search_place": "Pretraži",
   "finding_place": "Pronalaženje mesta ...",
-  "no_result_found": "Nema rezultata"
+  "no_result_found": "Nema rezultata",
+  "mobile_settings": "Поставке",
+  "location_denied_callback_msg": "Да бисте користили ову функцију, потребан нам је приступ вашој локацији.",
+  "location_permanently_denied_callback_msg": "Приступ локацији трајно је одбијен. Да бисте омогућили ову функцију, идите у подешавања вашег уређаја и доделите дозволу за локацију.",
+  "location_restricted_callback_msg": "Приступ локацији је ограничен. Да бисте користили ову функцију, проверите да ли су поставке локације вашег уређаја конфигурисане да омогуће приступ.",
+  "location_limited_callback_msg": "Приступ локацији је ограничен. Да бисте потпуно користили ову функцију, размислите о ажурирању поставки локације."
+
 }
 

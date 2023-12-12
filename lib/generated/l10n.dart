@@ -179,6 +179,56 @@ class S {
       args: [],
     );
   }
+
+  /// `Settings`
+  String get mobile_settings {
+    return Intl.message(
+      'Settings',
+      name: 'mobile_settings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `To use this feature, we require access to your location.`
+  String get location_denied_callback_msg {
+    return Intl.message(
+      'To use this feature, we require access to your location.',
+      name: 'location_denied_callback_msg',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Location access is permanently denied. To enable this feature, go to your device settings and grant location permission.`
+  String get location_permanently_denied_callback_msg {
+    return Intl.message(
+      'Location access is permanently denied. To enable this feature, go to your device settings and grant location permission.',
+      name: 'location_permanently_denied_callback_msg',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Location access is restricted. To use this feature, ensure that your device's location settings are configured to allow access.`
+  String get location_restricted_callback_msg {
+    return Intl.message(
+      'Location access is restricted. To use this feature, ensure that your device\'s location settings are configured to allow access.',
+      name: 'location_restricted_callback_msg',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Location access is limited. To use this feature fully, consider updating your location settings.`
+  String get location_limited_callback_msg {
+    return Intl.message(
+      'Location access is limited. To use this feature fully, consider updating your location settings.',
+      name: 'location_limited_callback_msg',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
@@ -192,10 +242,12 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
       Locale.fromSubtags(languageCode: 'es'),
       Locale.fromSubtags(languageCode: 'fr'),
       Locale.fromSubtags(languageCode: 'it'),
+      Locale.fromSubtags(languageCode: 'pl'),
       Locale.fromSubtags(languageCode: 'pt'),
       Locale.fromSubtags(languageCode: 'ru'),
       Locale.fromSubtags(languageCode: 'sr'),
       Locale.fromSubtags(languageCode: 'tr'),
+      Locale.fromSubtags(languageCode: 'uk'),
       Locale.fromSubtags(languageCode: 'zh'),
     ];
   }
