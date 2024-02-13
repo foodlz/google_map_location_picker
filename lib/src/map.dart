@@ -80,21 +80,34 @@ class MapPickerState extends State<MapPicker> {
   String? _postalCode;
   String? autoCompletePlaceId;
   Map<String, dynamic>? autoCompleteDetails;
+  var dialogOpen;
+  var isPermissionRequestInProgress = false;
 
   Future<void> getHeaders() async {
     final headers = await LocationUtils.getAppHeaders();
     setState(() => _headers = headers);
   }
 
-  void _onToggleMapTypePressed() {
-    final MapType nextType = MapType.values[(_currentMapType.index + 1) % MapType.values.length];
-    setState(() => _currentMapType = nextType);
+  @override
+  void initState() {
+    super.initState();
+    getHeaders();
+    if (widget.mapStylePath != null) {
+      rootBundle.loadString(widget.mapStylePath!).then((string) {
+        _mapStyle = string;
+      });
+    }
+    if (widget.automaticallyAnimateToCurrentLocation!)
+      _initCurrentLocation();
   }
 
   // This also checks for location permission.
   Future<void> _initCurrentLocation() async {
 
     if (!mounted) return;
+
+    // Check location permissions
+    await _checkGeolocationPermission();
 
     Position? currentPosition;
 
@@ -104,8 +117,6 @@ class MapPickerState extends State<MapPicker> {
       currentPosition = null;
       d("_initCurrentLocation#e = $e");
     }
-
-    if (!mounted) return;
 
     setState(() => _currentPosition = currentPosition);
 
@@ -128,6 +139,101 @@ class MapPickerState extends State<MapPicker> {
 
   }
 
+  //
+
+  Future _checkGeolocationPermission() async {
+
+    if (isPermissionRequestInProgress) {
+      return;
+    }
+
+    isPermissionRequestInProgress = true;
+
+    try {
+      await Permission.locationWhenInUse
+                      .onDeniedCallback(() {
+                        /// We haven't asked for permission yet or the permission has been denied before, but not permanently.
+                        if(dialogOpen == null) {
+                          dialogOpen = _showDeniedDialog();
+                        }
+                      })
+                      .onGrantedCallback(() {
+                        d("Location permission granted");
+                        if (dialogOpen != null) {
+                          Navigator.of(context, rootNavigator: true).pop();
+                          dialogOpen = null;
+                        }
+                      })
+                      .onPermanentlyDeniedCallback(() {
+                        /// The user opted to never again see the permission request dialog for this
+                        /// app. The only way to change the permission's status now is to let the
+                        /// user manually enables it in the system settings.
+                        if(dialogOpen == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(S
+                                    .of(context)
+                                    .location_permanently_denied_callback_msg),
+                                duration: Duration(seconds: 30),
+                                action: SnackBarAction(
+                                  label: S.of(context).mobile_settings,
+                                  onPressed: () {
+                                    openAppSettings();
+                                  },
+                                ),
+                              )
+                          );
+                          dialogOpen = _showDeniedForeverDialog();
+                        }
+                      })
+                      .onRestrictedCallback(() {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(S
+                                  .of(context)
+                                  .location_restricted_callback_msg),
+                              duration: Duration(seconds: 30),
+                              action: SnackBarAction(
+                                label: S.of(context).mobile_settings,
+                                onPressed: () {
+                                  openAppSettings();
+                                },
+                              ),
+                            )
+                        );
+                      })
+                    .onLimitedCallback(() {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(S
+                                .of(context)
+                                .location_limited_callback_msg),
+                            duration: Duration(seconds: 30),
+                            action: SnackBarAction(
+                              label: S.of(context).mobile_settings,
+                              onPressed: () {
+                                openAppSettings();
+                              },
+                            ),
+                          )
+                      );
+                    })
+                    .request();
+    } finally {
+      isPermissionRequestInProgress = false;
+      //if (dialogOpen != null) {
+      //  Navigator.of(context, rootNavigator: true).pop();
+      //  dialogOpen = null;
+      //}
+    }
+
+  }
+
+  void _onToggleMapTypePressed() {
+    final MapType nextType = MapType.values[(_currentMapType.index + 1) % MapType.values.length];
+    setState(() => _currentMapType = nextType);
+  }
+
   Future moveToCurrentLocation(LatLng currentLocation, {String? placeId, placeDetails}) async {
     final controller = await mapController.future;
     if(placeId != null) {
@@ -141,38 +247,13 @@ class MapPickerState extends State<MapPicker> {
       CameraPosition(target: currentLocation, zoom: widget.initialZoom!),
     ));
   }
-
-  @override
-  void initState() {
-    super.initState();
-    getHeaders();
-
-    if (widget.automaticallyAnimateToCurrentLocation! && !widget.requiredGPS!)
-      _initCurrentLocation();
-
-    if (widget.mapStylePath != null) {
-      rootBundle.loadString(widget.mapStylePath!).then((string) {
-        _mapStyle = string;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (widget.requiredGPS!) {
-      _checkGeolocationPermission();
-      if (_currentPosition == null) _initCurrentLocation();
-    }
-
-    if (_currentPosition != null && dialogOpen != null)
-      Navigator.of(context, rootNavigator: true).pop();
-
     return Scaffold(
       body: Builder(
         builder: (context) {
           if (_currentPosition == null &&
-              widget.automaticallyAnimateToCurrentLocation! &&
-              widget.requiredGPS!) {
+              widget.automaticallyAnimateToCurrentLocation!) {
             return const Center(child: CircularProgressIndicator());
           }
           return buildMap();
@@ -531,102 +612,13 @@ class MapPickerState extends State<MapPicker> {
     );
   }
 
-  var dialogOpen;
-
-  Future _checkGeolocationPermission() async {
-
-    await Permission.locationWhenInUse
-        .onDeniedCallback(() {
-      // We haven't asked for permission yet or the permission has been denied before, but not permanently.
-      _showDeniedDialog();
-    })
-        .onGrantedCallback(() {
-      d("onGrantedCallback");
-    })
-        .onPermanentlyDeniedCallback(() {
-      // The user opted to never again see the permission request dialog for this
-      // app. The only way to change the permission's status now is to let the
-      // user manually enables it in the system settings.
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(S
-                .of(context)
-                .location_permanently_denied_callback_msg),
-            duration: Duration(seconds: 30),
-            action: SnackBarAction(
-              label: S.of(context).mobile_settings,
-              onPressed: () {
-                openAppSettings();
-              },
-            ),
-          )
-      );
-      _showDeniedForeverDialog();
-    })
-        .onRestrictedCallback(() {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(S
-                .of(context)
-                .location_restricted_callback_msg),
-            duration: Duration(seconds: 30),
-            action: SnackBarAction(
-              label: S.of(context).mobile_settings,
-              onPressed: () {
-                openAppSettings();
-              },
-            ),
-          )
-      );
-    })
-        .onLimitedCallback(() {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(S
-                .of(context)
-                .location_limited_callback_msg),
-            duration: Duration(seconds: 30),
-            action: SnackBarAction(
-              label: S.of(context).mobile_settings,
-              onPressed: () {
-                openAppSettings();
-              },
-            ),
-          )
-      );
-    })
-    .request();
-
-    /*final geolocationStatus = await Geolocator.checkPermission();
-    d("geolocationStatus = $geolocationStatus");
-
-    if (geolocationStatus == LocationPermission.denied && dialogOpen == null) {
-      dialogOpen = _showDeniedDialog();
-    } else if (geolocationStatus == LocationPermission.deniedForever &&
-        dialogOpen == null) {
-      dialogOpen = _showDeniedForeverDialog();
-    } else if (geolocationStatus == LocationPermission.whileInUse ||
-        geolocationStatus == LocationPermission.always) {
-      d('GeolocationStatus.granted');
-
-      if (dialogOpen != null) {
-        Navigator.of(context, rootNavigator: true).pop();
-        dialogOpen = null;
-      }
-    }*/
-  }
-
   Future _showDeniedDialog() {
     return showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return WillPopScope(
-          onWillPop: () async {
-            Navigator.of(context, rootNavigator: true).pop();
-            Navigator.of(context, rootNavigator: true).pop();
-            return true;
-          },
+        return PopScope(
+          canPop: true,
           child: AlertDialog(
             title: Text(S.of(context).access_to_location_denied),
             content: Text(S.of(context).allow_access_to_the_location_services),
@@ -651,12 +643,8 @@ class MapPickerState extends State<MapPicker> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return WillPopScope(
-          onWillPop: () async {
-            Navigator.of(context, rootNavigator: true).pop();
-            Navigator.of(context, rootNavigator: true).pop();
-            return true;
-          },
+        return PopScope(
+          canPop: true,
           child: AlertDialog(
             title: Text(S.of(context).access_to_location_permanently_denied),
             content: Text(S
